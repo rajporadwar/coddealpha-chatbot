@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat With Ai</title>
+    <link rel="stylesheet" href="style.css?0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+</head>
+<body>
+    <div class="wrapper">
+        <section class="chat-area">
+            <header>
+                <a href="users.php" class="back-icon"><i class="fas fa-arrow-left"></i></a>
+                <img class="uimg" src="a.png" alt="">
+                <div class="details">
+                    <span>Ai Chat Bot</span>
+                    <p class="lastseen">Active Now</p>
+                </div>
+            </header> 
+            <div class="chat-box">
+            </div>
+            <form action="#" class="typing-area">
+                <input type="text" name="message" class="input-field" placeholder="Type a message here..." autocomplete="off">
+                <button onclick="sendMessage()"><i class="fab fa-telegram-plane"></i></button>
+            </form>
+        </section>
+    </div>
+<script>
+const form = document.querySelector(".typing-area");
+const chatbox = document.querySelector(".chat-box");
+const inputField = form.querySelector('input[type="text"]');
+const wsUrl = 'ws://localhost:8080';
+const ws = new WebSocket(wsUrl);
+ws.onopen = function() {
+    console.log('WebSocket connection established.');
+};
+ws.onmessage = function(event) {
+    console.log('Received:', event.data);
+    const encodedData = event.data
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+    chatbox.innerHTML += `<div class="chat incoming">
+    <img class="img" src="a.png" alt="">
+    <div class="details">
+        <p>` + encodedData +`</p>
+    </div>
+</div>`;
+};
+ws.onerror = function(error) {
+    console.error('WebSocket error:', error);
+};
+form.onsubmit = (e) => {
+    e.preventDefault();
+};
+function sendMessage() {
+    const message = inputField.value;
+    ws.send(message);
+    const encodedmessage = message;
+    chatbox.innerHTML += `<div class="chat outgoing">
+  <div class="details">
+       <p>` + encodedmessage + `</p>
+       </div>`;
+    inputField.value = "";
+}
+</script>
+</body>
+</html>
